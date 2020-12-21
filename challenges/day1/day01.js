@@ -22,6 +22,7 @@ In this list, the two entries that sum to 2020 are 1721 and 299. Multiplying the
 Of course, your expense report is much larger. Find the two entries that sum to 2020; what do you get if you multiply them together?
 */
 var fs = require('fs');
+
 fs.readFile('./input.txt', 'utf8', function(err, data) {
   if(err) throw err;
   const findPairThatAddsUpTo2020 = (data) => {
@@ -40,6 +41,26 @@ fs.readFile('./input.txt', 'utf8', function(err, data) {
     return product;
   };
 
+  const findTripletsThatAddUpTo2020 = (data) => {
+    const numbers = data.split('\n');
+    let product = null;
+    for(let i = 0; i < numbers.length; i++) {
+      const firstNumber = Number(numbers[i]);
+      for(let j = 0; j < numbers.length; j++) {
+        const secondNumber = Number(numbers[j]);
+        numbers.forEach(number => {
+          const thirdNumber = Number(number);
+          if(((2020 - secondNumber - thirdNumber) === firstNumber) && (product == null)) {
+            console.log(firstNumber * secondNumber * thirdNumber);
+            product = (firstNumber * secondNumber * thirdNumber);
+          };
+        });
+      }
+    }
+    return product;
+  };
+
 
   findPairThatAddsUpTo2020(data);
+  findTripletsThatAddUpTo2020(data);
 });
