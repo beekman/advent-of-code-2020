@@ -53,24 +53,40 @@ In this example, traversing the map using this slope would cause you to encounte
 
 Starting at the top-left corner of your map and following a slope of right 3 and down 1, how many trees would you encounter?
 */
-const checkCollisions = () => {
+let checkCollisions = (xChange, yChange) => {
+  let collisionCounts = 0;
+
   fs.readFile('./input.txt', 'utf8', function(err, data) {
     if(err) throw err;
     const rows = data.split('\n');
-    let xPosition = 0;
-    let yPosition = 0;
     let collisionCount = 0;
-    rows.forEach(row => {
-      if(row.length !== 0) {
+    let xPosition = 0;
+    let rowCount = 0;
+    for(let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      if((row.length !== 0)) {
         const sledIndex = xPosition % row.length;
-        if(row[sledIndex] == '#') collisionCount++;
+        if(row[sledIndex] === '#') {
+          collisionCount++;
+        }
       }
-      xPosition = xPosition + 3;
-      yPosition++;
-    });
+      xPosition = xPosition + xChange;
+      rowCount = rowCount + yChange;
+    };
     console.log(collisionCount);
+    return collisionCount;
   });
-
 };
 
-checkCollisions();
+const sumCollisions = () => {
+  checkCollisions(1, 1);
+  checkCollisions(3, 1);
+  checkCollisions(5, 1);
+  checkCollisions(7, 1);
+  checkCollisions(0.5, 1);
+};
+
+
+
+
+sumCollisions();
