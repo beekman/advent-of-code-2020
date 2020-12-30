@@ -35,6 +35,16 @@ BFFFBBFRRR: row 70, column 7, seat ID 567.
 FFFBBBFRRR: row 14, column 7, seat ID 119.
 BBFFBBFRLL: row 102, column 4, seat ID 820.
 As a sanity check, look through your list of boarding passes. What is the highest seat ID on a boarding pass?
+
+
+--- Part Two ---
+Ding! The "fasten seat belt" signs have turned on. Time to find your seat.
+
+It's a completely full flight, so your seat should be the only missing boarding pass in your list. However, there's a catch: some of the seats at the very front and back of the plane don't exist on this aircraft, so they'll be missing from your list as well.
+
+Your seat wasn't at the very front or back, though; the seats with IDs +1 and -1 from yours will be in your list.
+
+What is the ID of your seat?
 */
 
 
@@ -43,6 +53,13 @@ const input = require('fs')
   .split(/\n/)
   .map(values => ({ rowCode: values.slice(0, 7), columnCode: values.slice(7) }));
 let maxSeatId = 0;
+let seatIds = [];
+
+for(let i = 0; i < input.length - 1; i++) {
+  if(i > 84) seatIds[i] = true;
+  else seatIds[i] = false;
+}
+
 for(let i = 0; i < input.length - 1; i++) {
   let seat = input[i];
   let rowBinary = seat.rowCode.replace(/F/g, 0).replace(/B/g, 1);
@@ -50,7 +67,17 @@ for(let i = 0; i < input.length - 1; i++) {
   let columnBinary = seat.columnCode.replace(/R/g, 1).replace(/L/g, 0);
   const columnNumber = parseInt(columnBinary, 2);
   const seatId = rowNumber * 8 + columnNumber;
+  seatIds[seatId] = false;
   if(maxSeatId < seatId) maxSeatId = seatId;
   console.log('Row: ' + rowNumber + ' Seat: ' + columnNumber + ' Seat ID: ' + seatId);
 }
-console.log('Max Seat Id: ' + maxSeatId);
+
+// console.log(seatIds);
+
+console.log('Highest Seat Id: ' + maxSeatId);
+
+for(let i = 84; i < input.length - 1; i++) {
+  if(seatIds[i] === true) {
+    console.log('Your Seat Id: ' + i);
+  }
+}
