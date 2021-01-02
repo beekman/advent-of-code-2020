@@ -40,43 +40,104 @@ This is an infinite loop: with this sequence of jumps, the program will run fore
 Immediately before the program would run an instruction a second time, the value in the accumulator is 5.
 
 Run your copy of the boot code. Immediately before any instruction is executed a second time, what value is in the accumulator?
+
+Your puzzle answer was 1337.
+
+--- Part Two ---
+After some careful analysis, you believe that exactly one instruction is corrupted.
+
+Somewhere in the program, either a jmp is supposed to be a nop, or a nop is supposed to be a jmp. (No acc instructions were harmed in the corruption of this boot code.)
+
+The program is supposed to terminate by attempting to execute an instruction immediately after the last instruction in the file. By changing exactly one jmp or nop, you can repair the boot code and make it terminate correctly.
+
+For example, consider the same program from above:
+
+nop +0
+acc +1
+jmp +4
+acc +3
+jmp -3
+acc -99
+acc +1
+jmp -4
+acc +6
+If you change the first instruction from nop +0 to jmp +0, it would create a single-instruction infinite loop, never leaving that instruction. If you change almost any of the jmp instructions, the program will still eventually find another jmp instruction and loop forever.
+
+However, if you change the second-to-last instruction (from jmp -4 to nop -4), the program terminates! The instructions are visited in this order:
+
+nop +0  | 1
+acc +1  | 2
+jmp +4  | 3
+acc +3  |
+jmp -3  |
+acc -99 |
+acc +1  | 4
+nop -4  | 5
+acc +6  | 6
+After the last instruction (acc +6), the program terminates by attempting to run the instruction below the last instruction in the file. With this change, after the program terminates, the accumulator contains the value 8 (acc +1, acc +1, acc +6).
+
+Fix the program so that it terminates normally by changing exactly one jmp (to nop) or nop (to jmp). What is the value of the accumulator after the program terminates?
+
+Your puzzle answer was 1358.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
 */
-let fs = require("fs");
-fs.readFile("input.txt", "utf8", (err, data) => {
-  if(err) throw err;
-  let accumulator = 0;
-  let visited = [];
-  const instructions = data.split(/\n/g).map(a => a.split(' '));
-  for(let i = 0; i < instructions.length; i++) {
-    visited[i] = false;
+const fs = require('fs');
+
+const splitData = fs.readFileSync('./input.txt', 'utf-8').split("\n");
+let swappableLines = deploy(splitData, true);
+
+splitData.forEach((line, i) => {
+  const copy = JSON.parse(JSON.stringify(splitData));
+  if(swappableLines.indexOf(i) == -1) return;
+  if(line.indexOf('nop') > -1) {
+    copy[i] = line.replace('nop', 'jmp');
+  } else if(line.indexOf('jmp') > -1) {
+    copy[i] = line.replace('jmp', 'nop');
   }
-  let j = 0;
-  const parseInstructions = (instructions, accumulator, visited, j) => {
-    switch(instructions[j][0]) {
-      case 'nop':
-        visited[j] = true;
-        j = j + 1;
-        // console.log('no operation at ' + (j - 1) + ', next index ' + j);
-        break;
-      case 'acc':
-        visited[j] = true;
-        accumulator += Number(instructions[j][1]);
-        j = j + 1;
-        break;
-      case 'jmp':
-        visited[j] = true;
-        j += Number(instructions[j][1]);
-        // console.log('jumping to line ' + j);
-        break;
-    }
-    if(!visited[j]) {
-      parseInstructions(instructions, accumulator, visited, j);
-    }
-    else {
-      console.log('Value of accumulator when first loop point is hit is ' + accumulator);
-      return accumulator;
-    }
+  deploy(copy);
+});
+
+function deploy(instructions, outputDeadEnd) {
+  const lines = [];
+  let accumulator = 0;
+  let line = 0;
+  let runLines = [];
+
+
+  instructions.forEach(instruction => {
+    lines.push(splitInstruction(instruction));
+  });
+
+  return parse();
+
+  function splitInstruction(instruction) {
+    const parts = instruction.split(' ');
+    const type = parts[0];
+    const amount = Number(parts[1]);
+    return { type: type, amount: amount };
   };
 
-  parseInstructions(instructions, accumulator, visited, j);
-});
+  function parse() {
+    if(runLines.indexOf(line) > -1) {
+      if(outputDeadEnd) {
+        console.log('Accumulator Value When Loop Point is Hit', accumulator);
+      }
+      return runLines;
+    }
+
+    const command = lines[line];
+    runLines.push(line);
+
+    if(command.type === 'acc') {
+      accumulator += command.amount;
+      line++;
+    } else if(command.type === 'nop') {
+      line++;
+    } else if(command.type === 'jmp') {
+      line += command.amount;
+    }
+    if(instructions[line]) return parse();
+    console.log('Accumulator Value When Program Is Fixed and Completes: ', accumulator);
+  };
+};
