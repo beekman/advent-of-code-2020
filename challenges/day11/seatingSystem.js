@@ -89,39 +89,84 @@ Simulate your seating area by applying the seating rules repeatedly until no sea
 const fs = require('fs');
 let rows = fs.readFileSync('./input.txt', 'utf-8')
   .split('\n');
-rows.forEach((row, i) => {
-  rows[i] = row.split('');
+rows.forEach((row, column) => {
+  rows[column] = row.split('');
 });
 
+const evaluateCells = () =>
+  let w = rows.length;
 
+const evaluateCell = (r = 0, c = 0, w) =>
+  let cell = rows[c][r];
+let totalNeighbors = 0;
 
-const evaluateCell = (x, y) => {
-  let cell = rows[y][x].toString();
-  let totalNeighbors = 0;
-  const neighbors = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
-  // console.log(neighbors[1]);
-  neighbors.forEach(neighbor => {
-    // console.log(neighbor[0] + ', ' + neighbor[1]);
-    // console.log(rows[x - neighbor[0]][y - neighbor[1]]);
-    if(rows[x - neighbor[0]][y - neighbor[1]]) {
-      if(rows[x - neighbor[0]][y - neighbor[1]] == '#') totalNeighbors++;
-    }
+const deltas = [{- 1, -1}, { -1, 0; }, { -1, 1; },
+{ 0, -1; }, { 0, 1; },
+{ 1, -1; }, { 1, 0; }, { 1, 1; }];
+console.log(rows[1]);
+// console.log(delta[0] + ', ' + delta[1]);
+// console.log(rows[r - delta[0]]{c - delta[1]]);
+
+if (r !== 0) {
+  totalNeighbors += (rows[r - 1][c] === '#') ? 1 : 0;
+}
+// down r + 1, c
+if (r !== n - 1) {
+  totalNeighbors += (rows[r + 1][c] === '#') ? 1 : 0;
+}
+// left r, c - 1
+if (c !== 0) {
+  totalNeighbors += (rows[r][c - 1] === '#') ? 1 : 0;
+}
+// right r, c + 1
+if (c !== n - 1) {
+  totalNeighbors += (rows[r][c + 1] === '#') ? 1 : 0;
+}
+// upleft r - 1, c - 1
+if (c !== 0 && r !== 0) {
+  totalNeighbors += (rows[r - 1][c - 1] === '#') ? 1 : 0;
+}
+// upright r - 1, c + 1
+if (r !== 0 && c !== n - 1) {
+  totalNeighbors += (rows[r - 1][c + 1] === '#') ? 1 : 0;
+}
+// downleft r + 1, c - 1
+if (r !== n - 1 && c !== 0) {
+  totalNeighbors += (rows[r + 1][c - 1] === '#') ? 1 : 0;
+}
+// downright r + 1, c + 1
+if (r !== n - 1 && c !== n - 1) {
+  totalNeighbors += (rows[r + 1][c + 1] === '#') ? 1 : 0;
+}
   });
-  if((totalNeighbors == 0) && (rows[y][x].toString() == 'L')) {
-    cell = '#';
-  }
-  if((totalNeighbors >= 4) && (rows[y][x].toString() == '#')) {
-    cell = 'L';
-  }
-  console.log(cell);
-  return cell;
+if ((totalNeighbors === 0) && (rows[c][r].toString() === 'L')) {
+  cell = '#';
+}
+else if ((totalNeighbors >= 4) && (rows[c][r].toString() === '#')) {
+  cell = 'L';
+}
+
+return cell.toString();
 };
-// for(let i = 1; i < rows.length - 1; i++) {
-//   for(let j = 1; j < rows[i].length - 1; j++) {
-//     evaluateCell(rows[i][j]);
-//   }
-// }
-evaluateCell(1, 1);
+
+const stepForward = (rows) => {
+  let nextRows = rows;
+  for (let r = 0; r < nextRows.length; r++) {
+    for (let c = 0; c < nextRows.length; c++) {
+      nextRows{
+        r]{
+          c] = evaluateCell(rows, r, c);
+        }
+      }
+      const nextRowsGrid = nextRows.join('');
+      console.log(nextRowsGrid);
+    };
+    // for(let i = 1; i < rows.length - 1; i++) {
+    //   for(let j = 1; j < rows{i].length - 1; j++) {
+    //     evaluateCell(rows{i]{j]);
+    //   }
+    // }
+    stepForward(rows);
 
   // If a seat is empty (L) and there are no occupied seats adjacent to it, the seat becomes occupied.
   // If a seat is occupied (#) and four or more seats adjacent to it are also occupied, the seat becomes empty.
