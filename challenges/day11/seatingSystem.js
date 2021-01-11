@@ -85,90 +85,153 @@ Simulate your seating area by applying the seating rules repeatedly until no sea
 
 
 */
-
+const { dirxml } = require('console');
 const fs = require('fs');
-let rows = fs.readFileSync('./input.txt', 'utf-8')
-  .split('\n');
-rows.forEach((row, column) => {
-  rows[column] = row.split('');
-});
+let lines = fs.readFileSync('./input.txt', { encoding: 'utf-8' }).split('\n').filter(x => x);
 
-const evaluateCells = () =>
-  let w = rows.length;
+class Seating {
+  constructor(lines) {
+    this.height = lines.length;
+    this.width = lines[0].length;
 
-const evaluateCell = (r = 0, c = 0, w) =>
-  let cell = rows[c][r];
-let totalNeighbors = 0;
+    this.seats = lines;
+  }
 
-const deltas = [{- 1, -1}, { -1, 0; }, { -1, 1; },
-{ 0, -1; }, { 0, 1; },
-{ 1, -1; }, { 1, 0; }, { 1, 1; }];
-console.log(rows[1]);
-// console.log(delta[0] + ', ' + delta[1]);
-// console.log(rows[r - delta[0]]{c - delta[1]]);
+  nextState() {
+    let hasChanged = false;
 
-if (r !== 0) {
-  totalNeighbors += (rows[r - 1][c] === '#') ? 1 : 0;
-}
-// down r + 1, c
-if (r !== n - 1) {
-  totalNeighbors += (rows[r + 1][c] === '#') ? 1 : 0;
-}
-// left r, c - 1
-if (c !== 0) {
-  totalNeighbors += (rows[r][c - 1] === '#') ? 1 : 0;
-}
-// right r, c + 1
-if (c !== n - 1) {
-  totalNeighbors += (rows[r][c + 1] === '#') ? 1 : 0;
-}
-// upleft r - 1, c - 1
-if (c !== 0 && r !== 0) {
-  totalNeighbors += (rows[r - 1][c - 1] === '#') ? 1 : 0;
-}
-// upright r - 1, c + 1
-if (r !== 0 && c !== n - 1) {
-  totalNeighbors += (rows[r - 1][c + 1] === '#') ? 1 : 0;
-}
-// downleft r + 1, c - 1
-if (r !== n - 1 && c !== 0) {
-  totalNeighbors += (rows[r + 1][c - 1] === '#') ? 1 : 0;
-}
-// downright r + 1, c + 1
-if (r !== n - 1 && c !== n - 1) {
-  totalNeighbors += (rows[r + 1][c + 1] === '#') ? 1 : 0;
-}
-  });
-if ((totalNeighbors === 0) && (rows[c][r].toString() === 'L')) {
-  cell = '#';
-}
-else if ((totalNeighbors >= 4) && (rows[c][r].toString() === '#')) {
-  cell = 'L';
-}
+    const updatedSeats = [];
 
-return cell.toString();
-};
+    this.seats.forEach((line, y) => {
+      let updated = '';
 
-const stepForward = (rows) => {
-  let nextRows = rows;
-  for (let r = 0; r < nextRows.length; r++) {
-    for (let c = 0; c < nextRows.length; c++) {
-      nextRows{
-        r]{
-          c] = evaluateCell(rows, r, c);
+      [...line].forEach((seat, x) => {
+        let totalNeighbors = 0;
+        for (let i = -1; i <= 1; i++) {
+          for (let j = -1; j <= 1; j++) {
+            if ((i != 0 || j != 0)
+              && y + i >= 0
+              && y + i < this.height
+              && x + j >= 0
+              && x + j < this.width
+              && this.seats[y + i][x + j] === '#') {
+              totalNeighbors++;
+            }
+          }
         }
-      }
-      const nextRowsGrid = nextRows.join('');
-      console.log(nextRowsGrid);
-    };
-    // for(let i = 1; i < rows.length - 1; i++) {
-    //   for(let j = 1; j < rows{i].length - 1; j++) {
-    //     evaluateCell(rows{i]{j]);
-    //   }
-    // }
-    stepForward(rows);
+        if (seat == 'L' && totalNeighbors === 0) {
+          // If a seat is empty (L) and there are no occupied seats adjacent to it,
+          //    the seat becomes occupied.
+          updated += '#';
+          hasChanged = true;
+        } else if (seat === '#' && totalNeighbors >= 4) {
+          // If a seat is occupied (#) and four or more seats adjacent to it are also occupied,
+          //    the seat becomes empty.
+          updated += 'L';
+          hasChanged = true;
+        } else {
+          // Otherwise, the seat's state does not change.
+          updated += seat;
+        }
 
-  // If a seat is empty (L) and there are no occupied seats adjacent to it, the seat becomes occupied.
-  // If a seat is occupied (#) and four or more seats adjacent to it are also occupied, the seat becomes empty.
-  // Otherwise, the seat's state does not change.
-  // Floor (.) never changes; seats don't move, and nobody sits on the floor.
+      });
+
+      updatedSeats.push(updated);
+    });
+
+    this.seats = updatedSeats;
+
+    return hasChanged;
+  }
+
+  nextState2() {
+    let hasChanged = false;
+
+    const updatedSeats = [];
+
+    this.seats.forEach((line, y) => {
+      let updated = '';
+
+      [...line].forEach((seat, x) => {
+        let occupied = 0;
+        const directions = [
+          { x: 1, y: 0 }, { x: -1, y: 0 },
+          { x: 1, y: 1 }, { x: -1, y: -1 },
+          { x: 1, y: -1 }, { x: -1, y: 1 },
+          { x: 0, y: 1 }, { x: 0, y: -1 }
+        ];
+        directions.forEach(({ x: dx, y: dy }) => {
+          let posX = x + dx;
+          let posY = y + dy;
+          while (posX >= 0 && posY >= 0 && posX < this.width && posY < this.height) {
+            if (this.seats[posY][posX] === '#') {
+              occupied++;
+              break;
+            }
+            if (this.seats[posY][posX] === 'L') {
+              break;
+            }
+            posX += dx;
+            posY += dy;
+          }
+        });
+        if (seat == 'L' && occupied === 0) {
+          updated += '#';
+          hasChanged = true;
+        } else if (seat === '#' && occupied >= 5) {
+          updated += 'L';
+          hasChanged = true;
+        } else {
+          updated += seat;
+        }
+
+      });
+
+      updatedSeats.push(updated);
+    });
+
+    this.seats = updatedSeats;
+
+    return hasChanged;
+  }
+
+  getOccupiedSeats() {
+    let occupied = 0;
+    this.seats.forEach((line) => {
+      [...line].forEach((seat) => {
+        if (seat === '#') {
+          occupied++;
+        }
+      });
+    });
+    return occupied;
+  }
+
+  display() {
+    this.seats.forEach(line => {
+      console.log(line);
+    });
+  }
+}
+
+const grid = new Seating(lines);
+
+grid.display();
+
+while (grid.nextState()) {
+  //do nothing
+}
+
+grid.display();
+
+console.log(grid.getOccupiedSeats());
+
+const grid2 = new Seating(lines);
+
+while (grid2.nextState2()) {
+  //do nothing
+  grid2.display();
+  console.log('----------');
+}
+
+console.log(grid2.getOccupiedSeats());
