@@ -209,7 +209,7 @@ class Seating {
 
   display() {
     this.seats.forEach(line => {
-      console.log(line);
+      // console.log(line);
     });
   }
 }
@@ -222,7 +222,7 @@ while (grid.nextState()) {
   //do nothing
 }
 
-grid.display();
+// grid.display();
 
 console.log(grid.getOccupiedSeats());
 
@@ -230,8 +230,8 @@ const grid2 = new Seating(lines);
 
 while (grid2.nextState2()) {
   //do nothing
-  grid2.display();
-  console.log('----------');
+  // grid2.display();
+  // console.log('----------');
 }
 
 console.log(grid2.getOccupiedSeats());
