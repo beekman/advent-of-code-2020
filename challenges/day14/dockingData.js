@@ -18,7 +18,7 @@ class Program {
         console.log(groups);
         let address = Number(groups.address);
         let decimal = Number(groups.value);
-     
+
         let string = [...decimal.toString(2).padStart(36, '0')].map((value, index) => {
           if (this.mask[index] === 'X') return value;
           return this.mask[index];

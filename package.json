@@ -1,0 +1,20 @@
+{
+  "name": "advent-of-code-2020",
+  "version": "1.0.0",
+  "description": "My JavaScript/NodeJS solutions for the Advent of Code 2020 challenges at https://adventofcode.com/2020/. You can run each day's code using node _program_.js.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beekman/advent-of-code-2020.git"
+  },
+  "author": "Ben Beekman <bbeekman@gmail.com> (benbeekman.dev)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/beekman/advent-of-code-2020/issues"
+  },
+  "homepage": "https://github.com/beekman/advent-of-code-2020#readme",
+  "type": "module",
+}
