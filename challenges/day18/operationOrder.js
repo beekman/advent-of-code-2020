@@ -9,6 +9,15 @@ const evaluate = (string) => {
   return tokens[0];
 };
 
+const evaluateWithRevisedRules = (string) => {
+  while(/\+/.test(string)) {
+    string = string.replace(/(\d+) \+ (\d+)/g, (match, firstNumber, secondNumber) => {
+      return parseInt(firstNumber) + parseInt(secondNumber);
+    });
+  }
+  return eval(string);
+};
+
 const evaluateWithParentheses = (string, evaluate) => {
   while(string.includes('(')) {
     string = string.replace(/\(([^()]+)\)/g, (match, group) => {
@@ -22,4 +31,11 @@ let sum = 0;
 lines.forEach(line => {
   sum += evaluateWithParentheses(line, evaluate);
 });
+
 console.log(sum);
+
+let revisedSum = 0;
+lines.forEach(line => {
+  revisedSum += evaluateWithParentheses(line, evaluateWithRevisedRules);
+});
+console.log(revisedSum);
