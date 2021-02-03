@@ -12,7 +12,7 @@ const evaluate = (string) => {
 const evaluateWithRevisedRules = (string) => {
   while(/\+/.test(string)) {
     string = string.replace(/(\d+) \+ (\d+)/g, (match, firstNumber, secondNumber) => {
-      return parseInt(firstNumber) + parseInt(secondNumber);
+      return Number(firstNumber) + Number(secondNumber);
     });
   }
   return eval(string);
